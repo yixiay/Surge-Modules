@@ -1,0 +1,13 @@
+#!name=IPPure IP Info
+#!desc=实时监控指定策略组当前节点的 IP 纯净度、延迟和地理位置信息
+#!icon=https://ippure.com/logo.png
+#!author=Antigravity
+#!arguments=policy_group:✈️ 我的节点（所有订阅）
+#!arguments-desc=请输入需要检测的 Surge 策略组名称
+#!homepage=https://github.com/yixiay/Surge-Modules
+
+[Panel]
+IPPure-IP-Info = script-name=IPPure-IP-Info, update-interval=3600
+
+[Script]
+IPPure-IP-Info = type=generic, script-path=https://raw.githubusercontent.com/yixiay/Surge-Modules/main/modules/network-diagnostics/ippure/ippure_panel.js, argument="{{{policy_group}}}", timeout=10
