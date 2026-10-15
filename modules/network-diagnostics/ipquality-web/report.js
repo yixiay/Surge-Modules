@@ -1311,7 +1311,7 @@ async function testChatGPT() {
     const webState = classifyChatGPTWeb(web);
     const appState = classifyChatGPTApp(app);
 
-    if (!web && !app) return mediaResult("ChatGPT", "unknown", region, "请求失败");
+    if (!web && !app) return mediaResult("ChatGPT", "unknown", region, tasks.map((task, index) => ["Web", "App", "地区探测"][index] + "：" + (task.ok ? "HTTP " + task.value.status : task.error)).join("；"));
     if (webState === "available" && appState === "available") {
         return mediaResult("ChatGPT", "yes", region, "Web/App 探测端点均可达，不代表登录后功能");
     }

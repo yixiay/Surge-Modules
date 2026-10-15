@@ -20,6 +20,8 @@ for (const v of variants) {
     upstream=upstream.slice(0,mediaStart)+read('src/media-display.js')+'\n\n'+upstream.slice(mediaEnd);
     upstream=upstream.replace('return mediaResult(item[0], "unknown", "", "请求失败");',
       'return mediaResult(item[0], "unknown", "", `请求失败：${settled[index].error}`);');
+    upstream=upstream.replace('if (!web && !app) return mediaResult("ChatGPT", "unknown", region, "请求失败");',
+      'if (!web && !app) return mediaResult("ChatGPT", "unknown", region, tasks.map((task, index) => ["Web", "App", "地区探测"][index] + "：" + (task.ok ? "HTTP " + task.value.status : task.error)).join("；"));');
     // Authorization errors are terminal: never replay backend 403 requests.
     upstream=upstream.replace(/if \(!\/HTTP 403\\b\/i\.test\(errorMessage\(error\)\) \|\| attempt >= 3\) throw error;/g,'throw error; // Surge port: do not replay authorization failures.');
     body+='\nfunction runLoon($done, $persistentStore, $environment, $httpClient) {\n'+upstream+'\n}\n';

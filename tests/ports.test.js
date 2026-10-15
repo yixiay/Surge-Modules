@@ -121,6 +121,7 @@ for(const variant of ['mayihei','web']) {
     for(const name of names)assert.ok(html.includes('>'+name+'</span>'),name);
     assert.doesNotMatch(html,/⚪ 未确认：/);
     assert.match(html,/HTTP timeout &lt;test&gt;/);
+    assert.match(html,/Web：HTTP timeout &lt;test&gt;；App：HTTP timeout &lt;test&gt;；地区探测：HTTP timeout &lt;test&gt;/);
     const panel=await execute(variant,{store,trigger:'auto-interval'});
     for(const name of names)assert.ok(panel.result.content.includes(name),name);
     assert.match(panel.result.content,/请求失败：HTTP timeout <test>/);
