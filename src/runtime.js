@@ -73,7 +73,7 @@
   function panelContent(previous) {
     // Old caches contain full HTML even though their summary was truncated.
     const text = previous.html ? reportText(previous.html) : previous.text || previous.summary || '';
-    return text + '\n\n详细报告：' + base;
+    return formatPanelText(text, {policy,time:previous.time}) + '\n\n彩色报告\n' + base;
   }
   let action = 'all';
   if (request) {
@@ -111,7 +111,7 @@
     if (typeof $trigger !== 'undefined' && $trigger === 'button') {
       $notification.post(title, '报告已生成', base, {url:base});
     }
-    nativeDone({title,content:panelContent({text}),icon:'shield.lefthalf.filled'});
+    nativeDone({title,content:panelContent({text,time}),icon:'shield.lefthalf.filled'});
   }
   // Loon uses node and millisecond timeouts; Surge uses policy and seconds.
   function transport(method, supplied, callback) {

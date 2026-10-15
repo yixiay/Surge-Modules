@@ -11,7 +11,7 @@ const variants = [
 ];
 for (const v of variants) {
   const dir='modules/network-diagnostics/'+v.dir;
-  let body=read('src/runtime.js').replace('__FLAVOR__',v.id).replace('__TITLE__',v.title);
+  let body=read('src/panel-format.js')+'\n'+read('src/runtime.js').replace('__FLAVOR__',v.id).replace('__TITLE__',v.title);
   if (v.source) {
     let upstream=read(v.source);
     // Authorization errors are terminal: never replay backend 403 requests.

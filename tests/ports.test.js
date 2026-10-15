@@ -102,7 +102,7 @@ for (const variant of ['mayihei','web','xykt']) {
     const {result,calls}=await execute(variant,{trigger:'auto-interval',store:{[key]:JSON.stringify({html,summary:'截断摘要'})}});
     assert.equal(calls.length,0);
     assert.match(result.content,/基础信息\nIP: 203.0.113.9/);
-    assert.match(result.content,/运营商 A & B\nIPQS 未知/);
+    assert.match(result.content,/运营商 A & B\n\nIPQS 未知/);
     assert.match(result.content,/末尾数据 🇯🇵\n完成/);
     assert.doesNotMatch(result.content,/截断摘要|color:red|<div>|&amp;/);
   });
