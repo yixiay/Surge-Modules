@@ -7,7 +7,7 @@ const surgeCli =
   "/Applications/Surge.app/Contents/Applications/surge-cli";
 const modulePath = path.resolve(
   __dirname,
-  "../modules/network-diagnostics/ippure/ippure.sgmodule"
+  process.argv[2] || "../modules/network-diagnostics/ipquality-mayihei/module.sgmodule"
 );
 const uri = pathToFileURL(modulePath).href;
 const text = fs.readFileSync(modulePath, "utf8");

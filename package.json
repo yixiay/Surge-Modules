@@ -2,7 +2,8 @@
   "name": "surge-modules",
   "private": true,
   "scripts": {
+    "build": "node scripts/build.js",
     "test": "node --test tests/*.test.js",
-    "validate:module": "node tests/validate-module-lsp.js"
+    "validate:module": "node scripts/validate-all.js"
   }
 }

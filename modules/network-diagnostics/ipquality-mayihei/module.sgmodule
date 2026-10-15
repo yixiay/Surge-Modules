@@ -1,0 +1,16 @@
+#!name=IP 质量检测 · MaYIHEI
+#!desc=彩色 HTML 详细报告：http://ipquality.surge.local/mayihei 。面板可手动生成报告。无需 MITM。
+#!category=网络诊断
+#!arguments=policy_group:✈️ 我的节点（所有订阅）,mask_ip:false,media_test:false
+#!arguments-desc=填写现有节点或策略组；mask_ip 控制隐藏出口 IP。media_test 控制流媒体检测。
+#!homepage=https://github.com/yixiay/Surge-Modules
+
+[Host]
+ipquality.surge.local = 127.0.0.1
+
+[Script]
+ipquality-mayihei-panel = type=generic,script-path=https://raw.githubusercontent.com/yixiay/Surge-Modules/main/modules/network-diagnostics/ipquality-mayihei/report.js,argument="policy={{{policy_group}}}&mask={{{mask_ip}}}&media={{{media_test}}}",timeout=55
+ipquality-mayihei-report = type=http-request,pattern=^http://ipquality\.surge\.local/mayihei(?:/|$|\?),script-path=https://raw.githubusercontent.com/yixiay/Surge-Modules/main/modules/network-diagnostics/ipquality-mayihei/report.js,argument="policy={{{policy_group}}}&mask={{{mask_ip}}}&media={{{media_test}}}",timeout=55,requires-body=false
+
+[Panel]
+ipquality-mayihei = script-name=ipquality-mayihei-panel,update-interval=3600
