@@ -52,6 +52,30 @@
   function cached() {
     try { return JSON.parse(nativeStore.read(cacheKey) || 'null'); } catch (_) { return null; }
   }
+  function reportText(html) {
+    const entities = {nbsp:' ',amp:'&',lt:'<',gt:'>',quot:'"',apos:"'"};
+    return String(html || '')
+      .replace(/<(style|script)\b[^>]*>[\s\S]*?<\/\1>/gi, '')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<br\s*\/?\s*>/gi, '\n')
+      .replace(/<\/(td|th)>/gi, '\t')
+      .replace(/<\/(span|b|strong)>/gi, ' ')
+      .replace(/<h[1-6]\b[^>]*>/gi, '\n\n')
+      .replace(/<\/(div|p|li|tr|section|details|summary|h[1-6]|pre)>/gi, '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&(#x[0-9a-f]+|#\d+|nbsp|amp|lt|gt|quot|apos);/gi, (whole, key) => {
+        if (key[0] !== '#') return entities[key.toLowerCase()];
+        const point = key[1].toLowerCase() === 'x' ? parseInt(key.slice(2),16) : Number(key.slice(1));
+        return point > 0 && point <= 0x10ffff && !(point >= 0xd800 && point <= 0xdfff) ? String.fromCodePoint(point) : whole;
+      })
+      .split('\n').map(line => line.replace(/[ \t\r]+/g, ' ').trim()).join('\n')
+      .replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function panelContent(previous) {
+    // Old caches contain full HTML even though their summary was truncated.
+    const text = previous.html ? reportText(previous.html) : previous.text || previous.summary || '';
+    return text + '\n\n详细报告：' + base;
+  }
   let action = 'all';
   if (request) {
     const match = String(request.url).match(/^http:\/\/ipquality\.surge\.local\/(mayihei|web|xykt)(?:\/([a-z]+))?\/?(?:\?.*)?$/);
@@ -69,7 +93,7 @@
     }
   } else if (typeof $trigger !== 'undefined' && $trigger === 'auto-interval') {
     const previous = cached();
-    nativeDone({title,content: previous ? previous.summary + '\n' + base : '打开报告并选择检测项目\n' + base,icon:'shield.lefthalf.filled'});
+    nativeDone({title,content: previous ? panelContent(previous) : '打开报告并选择检测项目\n' + base,icon:'shield.lefthalf.filled'});
     return;
   }
   function finish(result) {
@@ -80,16 +104,15 @@
     }
     if (!html) html = `<p class="bad">${esc(result && result.content || '检测未完成')}</p>`;
     html = html.replace(/Loon 不提供节点 TCP\/DNS API/g, '此 Surge 移植版未实现 TCP/DNS 原始探测');
-    const text = html.replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
-    const summary = text.slice(0, 160);
+    const text = reportText(html);
     const time = new Date().toISOString();
-    if (html.length < 500000) nativeStore.write(JSON.stringify({html,summary,time}), cacheKey);
+    if (html.length < 500000) nativeStore.write(JSON.stringify({html,text,time}), cacheKey);
     if (request) { respond(`<p class="note">本次检测：${esc(time)} · ${esc(modules[action][0])}</p>${html}`); return; }
     done = true;
     if (typeof $trigger !== 'undefined' && $trigger === 'button') {
       $notification.post(title, '报告已生成', base, {url:base});
     }
-    nativeDone({title,content:summary + '\n详细报告：' + base,icon:'shield.lefthalf.filled'});
+    nativeDone({title,content:panelContent({text}),icon:'shield.lefthalf.filled'});
   }
   // Loon uses node and millisecond timeouts; Surge uses policy and seconds.
   function transport(method, supplied, callback) {

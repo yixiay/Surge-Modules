@@ -85,3 +85,25 @@ test('unknown route rejected without requests',async()=>{
   const {result,calls}=await execute('web',{route:'/unknown',method:'POST'});
   assert.equal(result.response.status,404);assert.equal(calls.length,0);
 });
+
+for (const variant of ['mayihei','web','xykt']) {
+  test(variant+' panel preserves complete new results including final fields',async()=>{
+    const {result,store}=await execute(variant);
+    assert.ok(result.content.length>160);
+    assert.match(result.content,/风险评分[\s\S]*风险因素[\s\S]*数据状态/);
+    assert.ok(result.content.split('\n').length>10);
+    const cachedRun=await execute(variant,{store,trigger:'auto-interval'});
+    assert.equal(cachedRun.calls.length,0);
+    assert.equal(cachedRun.result.content,result.content);
+  });
+  test(variant+' reconstructs full text from old truncated-summary cache',async()=>{
+    const key='ipquality.'+variant+'.'+encodeURIComponent('测试 🇯🇵 节点')+'.false';
+    const html='<style>.hidden{color:red}</style><h2>基础信息</h2><div>IP: 203.0.113.9</div><p>'+ '完整字段 '.repeat(60) +'</p><h2>风险因素</h2><div><span>运营商</span><span>A &amp; B</span></div><table><tr><th>IPQS</th><td>未知</td></tr></table><div>末尾数据 &#x1F1EF;&#127477;<br>完成</div>';
+    const {result,calls}=await execute(variant,{trigger:'auto-interval',store:{[key]:JSON.stringify({html,summary:'截断摘要'})}});
+    assert.equal(calls.length,0);
+    assert.match(result.content,/基础信息\nIP: 203.0.113.9/);
+    assert.match(result.content,/运营商 A & B\nIPQS 未知/);
+    assert.match(result.content,/末尾数据 🇯🇵\n完成/);
+    assert.doesNotMatch(result.content,/截断摘要|color:red|<div>|&amp;/);
+  });
+}
