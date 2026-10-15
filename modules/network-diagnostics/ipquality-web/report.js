@@ -66,6 +66,7 @@ function formatPanelText(text, metadata) {
     s.lines.forEach((line,i)=>{
       // Keep each provider with its detail lines; separate subsequent providers.
       if (i && /IP 类型属性|风险因素/.test(s.name) && !line.startsWith('  ') && !/^命中|未命中|代理：|VPN：|Tor：|未返回/.test(line) && /^(?:IPinfo|IP2Location|IPQS|ipapi|ipregistry|ipdata|ipwhois|proxycheck|AbuseIPDB|Scamalytics|DB-IP|IPPure)(?:\s|：|$)/.test(line)) rows.push('');
+      if (i && s.name.startsWith('流媒体与 AI') && /^(✅|🟠|❌|⚪)\s/.test(line)) rows.push('');
       rows.push(line);
     });
     return '▌'+s.name+'\n'+rows.join('\n');
@@ -1112,7 +1113,7 @@ async function collectMedia() {
     return tests.map((item, index) => {
         if (settled[index].ok) return settled[index].value;
         console.log(`[WARN] ${item[0]}: ${settled[index].error}`);
-        return mediaResult(item[0], "unknown", "", "请求失败");
+        return mediaResult(item[0], "unknown", "", `请求失败：${settled[index].error}`);
     });
 }
 
@@ -2503,26 +2504,24 @@ function renderFactorCards(sources) {
     }).join("");
 }
 
+// All media results remain visible, including unknown states and their evidence.
 function renderMediaList(rows) {
-    const confirmed = rows.filter((row) => row.status !== "unknown");
-    const unknown = rows.filter((row) => row.status === "unknown");
-    const body = confirmed.map((row) => {
+    if (!rows.length) return mutedLine("本次没有服务检测结果");
+    return rows.map((row) => {
         const status = mediaStatus(row.status);
-        const icon = row.status === "yes" ? "✅" : row.status === "partial" ? "🟠" : "❌";
+        const icon = row.status === "yes" ? "✅"
+            : row.status === "partial" ? "🟠"
+            : row.status === "no" ? "❌" : "⚪";
         const summary = `${status.text}${row.region ? ` · [${row.region}]` : ""}`;
-        const detail = row.detail
-            ? `<div style="font-size:11px;color:#8e8e93;margin-top:1px">${escapeHtml(row.detail)}</div>`
-            : "";
-        return '<div style="margin-bottom:10px">'
-            + `<span>${icon}</span>&nbsp;<span style="font-weight:700">${escapeHtml(row.name)}</span>&nbsp;&nbsp;`
-            + `<span style="color:${status.color};font-weight:600">${escapeHtml(summary)}</span>${detail}`
+        const reason = row.detail || (row.status === "unknown" ? "未返回可判定信息" : "");
+        return '<div class="media-result" style="margin-bottom:12px">'
+            + `<div><span>${icon}</span>&nbsp;<span style="font-weight:700">${escapeHtml(row.name)}</span>&nbsp;&nbsp;`
+            + `<span style="color:${status.color};font-weight:600">${escapeHtml(summary)}</span></div>`
+            + (reason ? `<div style="font-size:11px;color:#8e8e93;margin-top:2px">${escapeHtml(reason)}</div>` : "")
             + "</div>";
     }).join("");
-    const unknownLine = unknown.length
-        ? mutedLine(`⚪ 未确认：${unknown.map((row) => row.name).join("、")}`)
-        : "";
-    return (body || mutedLine("本次没有确认任何服务状态")) + unknownLine;
 }
+
 
 function renderAudit(audit, probe, stats) {
     const sourceStatus = `来源 ${audit.success.length}/${audit.total}`;

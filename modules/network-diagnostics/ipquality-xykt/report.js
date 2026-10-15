@@ -66,6 +66,7 @@ function formatPanelText(text, metadata) {
     s.lines.forEach((line,i)=>{
       // Keep each provider with its detail lines; separate subsequent providers.
       if (i && /IP 类型属性|风险因素/.test(s.name) && !line.startsWith('  ') && !/^命中|未命中|代理：|VPN：|Tor：|未返回/.test(line) && /^(?:IPinfo|IP2Location|IPQS|ipapi|ipregistry|ipdata|ipwhois|proxycheck|AbuseIPDB|Scamalytics|DB-IP|IPPure)(?:\s|：|$)/.test(line)) rows.push('');
+      if (i && s.name.startsWith('流媒体与 AI') && /^(✅|🟠|❌|⚪)\s/.test(line)) rows.push('');
       rows.push(line);
     });
     return '▌'+s.name+'\n'+rows.join('\n');

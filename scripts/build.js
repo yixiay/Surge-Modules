@@ -14,6 +14,12 @@ for (const v of variants) {
   let body=read('src/panel-format.js')+'\n'+read('src/runtime.js').replace('__FLAVOR__',v.id).replace('__TITLE__',v.title);
   if (v.source) {
     let upstream=read(v.source);
+    const mediaStart=upstream.indexOf('function renderMediaList(rows) {');
+    const mediaEnd=upstream.indexOf('function renderAudit(',mediaStart);
+    if(mediaStart<0 || mediaEnd<0) throw Error('Upstream media rendering boundary changed: '+v.source);
+    upstream=upstream.slice(0,mediaStart)+read('src/media-display.js')+'\n\n'+upstream.slice(mediaEnd);
+    upstream=upstream.replace('return mediaResult(item[0], "unknown", "", "请求失败");',
+      'return mediaResult(item[0], "unknown", "", `请求失败：${settled[index].error}`);');
     // Authorization errors are terminal: never replay backend 403 requests.
     upstream=upstream.replace(/if \(!\/HTTP 403\\b\/i\.test\(errorMessage\(error\)\) \|\| attempt >= 3\) throw error;/g,'throw error; // Surge port: do not replay authorization failures.');
     body+='\nfunction runLoon($done, $persistentStore, $environment, $httpClient) {\n'+upstream+'\n}\n';

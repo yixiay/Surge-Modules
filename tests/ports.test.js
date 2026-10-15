@@ -15,6 +15,7 @@ function execute(variant,{route='',method='GET',arg='policy=测试 🇯🇵 节�
       assert.ok(options.timeout>0 && options.timeout<=47,'Surge timeout must be seconds');
       assert.equal(options.node,undefined);
       let data=fixture?fixture(options):undefined;
+      if(data instanceof Error){setImmediate(()=>cb(data.message,null,null));return;}
       if(data===undefined) {
         if(/cdn-cgi\/trace/.test(options.url)) data='ip='+ip+'\n';
         else if(/ipify|ippure|ipapi/.test(options.url)) data={ip,fraudScore:5,country:'Japan',countryCode:'JP'};
@@ -105,5 +106,24 @@ for (const variant of ['mayihei','web','xykt']) {
     assert.match(result.content,/运营商 A & B\n\nIPQS 未知/);
     assert.match(result.content,/末尾数据 🇯🇵\n完成/);
     assert.doesNotMatch(result.content,/截断摘要|color:red|<div>|&amp;/);
+  });
+}
+
+for(const variant of ['mayihei','web']) {
+  test(variant+' shows all seven media results individually with failure reasons',async()=>{
+    const names=['TikTok','Disney+','Netflix','YouTube','Prime Video','Reddit','ChatGPT'];
+    const {result,store}=await execute(variant,{
+      route:variant==='web'?'/media':'/all',method:'POST',arg:'policy=测试 🇯🇵 节点&mask=false&media=true',
+      fixture:o=>/tiktok|disney|netflix|youtube|google|primevideo|reddit|chatgpt|openai/i.test(o.url)?new Error('HTTP timeout <test>'):undefined
+    });
+    const html=result.response.body;
+    assert.equal((html.match(/class="media-result"/g)||[]).length,7);
+    for(const name of names)assert.ok(html.includes('>'+name+'</span>'),name);
+    assert.doesNotMatch(html,/⚪ 未确认：/);
+    assert.match(html,/HTTP timeout &lt;test&gt;/);
+    const panel=await execute(variant,{store,trigger:'auto-interval'});
+    for(const name of names)assert.ok(panel.result.content.includes(name),name);
+    assert.match(panel.result.content,/请求失败：HTTP timeout <test>/);
+    assert.match(panel.result.content,/\n\n⚪/);
   });
 }
