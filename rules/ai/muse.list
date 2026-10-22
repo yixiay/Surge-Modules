@@ -1,4 +1,13 @@
 # > muse.ai
+
+# ============================================================
+# Muse AI / Meta AI - Aggressive Domain Rule Set
+# Target policy is defined in the Surge main configuration.
+# Original 7 rules preserved.
+# Third-party dependency candidates are not all verified.
+# ============================================================
+
+# ===== 1. Original Muse rules - preserve all 7 =====
 DOMAIN-SUFFIX,meta.com
 DOMAIN-SUFFIX,cdninstagram.com
 DOMAIN-SUFFIX,fbcdn.net
@@ -6,3 +15,65 @@ DOMAIN-SUFFIX,facebook.com
 DOMAIN-SUFFIX,muse.ai
 DOMAIN-SUFFIX,meta.ai
 DOMAIN-SUFFIX,metaaivm.com
+
+# ===== 2. Meta / Facebook infrastructure =====
+DOMAIN-SUFFIX,facebook.net
+DOMAIN-SUFFIX,fb.com
+DOMAIN-SUFFIX,fb.net
+DOMAIN-SUFFIX,fbsbx.com
+DOMAIN-SUFFIX,fbcdn.com
+DOMAIN-SUFFIX,facebook-dns.com
+DOMAIN-SUFFIX,meta.net
+DOMAIN-SUFFIX,meta.com
+
+# ===== 3. Instagram =====
+DOMAIN-SUFFIX,instagram.com
+DOMAIN-SUFFIX,instagram.net
+DOMAIN-SUFFIX,cdninstagram.com
+
+# ===== 4. Threads / Messenger =====
+DOMAIN-SUFFIX,threads.net
+DOMAIN-SUFFIX,messenger.com
+DOMAIN-SUFFIX,m.me
+
+# ===== 5. WhatsApp =====
+DOMAIN-SUFFIX,whatsapp.com
+DOMAIN-SUFFIX,whatsapp.net
+
+# ===== 6. Meta Quest / Oculus =====
+DOMAIN-SUFFIX,metaquest.com
+DOMAIN-SUFFIX,oculus.com
+DOMAIN-SUFFIX,oculuscdn.com
+
+# ===== 7. Other Meta services =====
+DOMAIN-SUFFIX,workplace.com
+DOMAIN-SUFFIX,workplace.fb.com
+DOMAIN-SUFFIX,metacareers.com
+
+# ===== 8. Authentication / anti-bot candidates =====
+DOMAIN-SUFFIX,workos.com
+DOMAIN-SUFFIX,workoscdn.com
+DOMAIN-SUFFIX,workos.imgix.net
+DOMAIN-SUFFIX,auth0.com
+DOMAIN-SUFFIX,cloudflare.com
+DOMAIN-SUFFIX,challenges.cloudflare.com
+
+# ===== 9. Monitoring / telemetry candidates =====
+DOMAIN-SUFFIX,sentry.io
+DOMAIN-SUFFIX,datadoghq.com
+DOMAIN-SUFFIX,statsigapi.net
+DOMAIN-SUFFIX,statsig.com
+DOMAIN-SUFFIX,launchdarkly.com
+DOMAIN-SUFFIX,segment.io
+DOMAIN-SUFFIX,segment.com
+
+# ===== 10. Support / billing candidates =====
+DOMAIN-SUFFIX,intercom.io
+DOMAIN-SUFFIX,intercomcdn.com
+DOMAIN-SUFFIX,stripe.com
+
+# ===== 11. Real-time communication candidate =====
+DOMAIN-SUFFIX,livekit.cloud
+DOMAIN-SUFFIX,livekit.io
+
+# ===== EOF =====
