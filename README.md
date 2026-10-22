@@ -12,6 +12,14 @@
 
 原 `modules/network-diagnostics/ippure/ippure.sgmodule` 已移除。请在 Surge 中移除旧模块后，添加上述入口。无需同时安装三份；查看详细报告推荐 Web 扩展版。
 
+## 规则集
+
+| 类别 | 规则 | 引用地址 |
+|---|---|---|
+| AI | Muse | [muse.list](https://raw.githubusercontent.com/yixiay/Surge-Modules/main/rules/ai/muse.list) |
+
+Muse 规则集移植自 [Tartarus2014/Loon-Script](https://github.com/Tartarus2014/Loon-Script/blob/master/Rule/Other/Muse.lsr)，保留原有 7 条域名后缀规则，包括 Meta、Facebook 相关域名。在 Surge 的 `[Rule]` 中按需添加 `RULE-SET,https://raw.githubusercontent.com/yixiay/Surge-Modules/main/rules/ai/muse.list,你的策略组名称`；请将规则放在可能提前命中这些域名的宽泛规则及 `FINAL` 之前。
+
 ## 如何查看彩色报告
 
 1. 安装并启用模块，确认 Surge 的脚本功能已开启；Mac 使用系统代理或增强模式，iPhone 启用 Surge。
